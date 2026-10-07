@@ -1,5 +1,7 @@
 # LeadLens: AI-Powered Lead Scoring and Sales Recommendation System for Salesforce
 
+**[>> Try the live demo](https://itstarushi-gif.github.io/leadlens/)** - the full SDR Workbench with the trained model and sample leads running entirely in your browser (no server needed).
+
 An AI assistant for SDRs. A lead enters Salesforce, the model predicts its chance of converting, a 0-100 score ranks it,
 and a Next Best Action with a plain-English reason is written back onto the Lead record.
 
