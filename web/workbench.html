@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LeadLens SDR Workbench</title>
+<style>
+:root{--bg:#f3f6fb;--panel:#fff;--ink:#032d60;--text:#2e4468;--mute:#5c7090;--line:#d8e2f0;--blue:#0176d3;--soft:#eaf5fe;--green:#2e844a;--red:#ba0517;--amber:#dd7a01;--grey:#706e6b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#081426;--panel:#10213d;--ink:#eaf3ff;--text:#c3d3ec;--mute:#93a7c8;--line:#233a5f;--blue:#57a9ff;--soft:#13304f;--green:#5fd28a;--red:#ff7d85;--amber:#ffb454;--grey:#a9b4c6}}
+:root[data-theme="dark"]{--bg:#081426;--panel:#10213d;--ink:#eaf3ff;--text:#c3d3ec;--mute:#93a7c8;--line:#233a5f;--blue:#57a9ff;--soft:#13304f;--green:#5fd28a;--red:#ff7d85;--amber:#ffb454;--grey:#a9b4c6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3{color:var(--ink);margin:0}
+header{background:linear-gradient(180deg,#0b5cab,#0176d3);color:#fff;padding:.9rem 4vw;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+header h1{color:#fff;font-size:1.25rem}header .mode{margin-left:auto;background:rgba(255,255,255,.2);border-radius:99px;padding:.15rem .8rem;font-size:.8rem;font-weight:600}
+.tabs{display:flex;gap:.3rem;padding:.6rem 4vw 0;border-bottom:1px solid var(--line);background:var(--panel)}
+.tabs button{border:0;background:none;padding:.6rem 1rem;font:inherit;font-weight:700;color:var(--mute);cursor:pointer;border-bottom:3px solid transparent}
+.tabs button.on{color:var(--blue);border-color:var(--blue)}
+main{padding:1rem 4vw 3rem;max-width:1400px;margin:0 auto}
+:focus-visible{outline:3px solid #1b96ff;outline-offset:2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem;margin-bottom:1rem}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.6rem .9rem}
+.kpi b{display:block;font-size:1.5rem;color:var(--ink)}.kpi span{font-size:.8rem;color:var(--mute)}
+.cols{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:1rem;align-items:start}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.bar-top{display:flex;gap:.4rem;flex-wrap:wrap;padding:.7rem;border-bottom:1px solid var(--line);align-items:center}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:99px;padding:.15rem .8rem;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+input[type=search],select,input[type=number]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.3rem .5rem}
+.list{max-height:70vh;overflow:auto}
+.row{display:grid;grid-template-columns:2rem minmax(0,1.6fr) 90px 80px minmax(0,1.2fr);gap:.5rem;padding:.55rem .8rem;border-bottom:1px solid var(--line);cursor:pointer;align-items:center;font-size:.88rem}
+.row:hover{background:var(--soft)}.row.sel{background:var(--soft);box-shadow:inset 3px 0 var(--blue)}
+.row small{display:block;color:var(--mute);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .nm{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd{background:var(--soft);font-weight:700;color:var(--ink);cursor:default}.hd:hover{background:var(--soft)}
+.sc{display:flex;align-items:center;gap:.4rem;font-weight:700;color:var(--ink)}.sc i{display:block;height:6px;border-radius:9px;flex:1;max-width:44px;background:var(--line);overflow:hidden}.sc i s{display:block;height:100%}
+.p{font-weight:700;border-radius:99px;padding:.05rem .6rem;font-size:.75rem;color:#fff;white-space:nowrap}
+.vh{background:var(--red)}.hi{background:var(--amber)}.md{background:#0b7cc4}.lw{background:var(--grey)}
+.det{padding:1rem}.det h2{font-size:1.2rem}.det .sub{color:var(--mute);font-size:.88rem}
+.ai{background:var(--soft);border-radius:8px;padding:.9rem;margin:.8rem 0}
+.ai .big{font-size:2.4rem;font-weight:800;color:var(--ink);line-height:1}
+.fld{display:grid;grid-template-columns:140px 1fr;gap:.4rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.88rem}.fld:last-child{border:0}.fld span{color:var(--mute)}.fld b{color:var(--ink)}
+.drv{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 44px;gap:.5rem;align-items:center;font-size:.82rem;padding:.15rem 0}
+.drv i{display:block;height:8px;border-radius:5px}
+.sect{margin-top:1rem}.sect>h3{font-size:.95rem;margin-bottom:.4rem}
+.wi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.4rem .9rem}
+.wi label{display:flex;justify-content:space-between;font-size:.82rem;font-weight:600;color:var(--ink)}.wi input[type=range]{width:100%;accent-color:var(--blue)}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:.45rem .9rem;font:inherit;font-weight:700;cursor:pointer}.btn.alt{background:var(--panel);color:var(--blue);border:1px solid var(--blue)}
+.act{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+.log{font-size:.82rem;color:var(--mute);margin:.4rem 0 0;padding-left:1rem}
+.note{background:var(--soft);border-left:4px solid var(--blue);padding:.6rem .8rem;border-radius:4px;font-size:.85rem;margin-top:.8rem}
+table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--line);font-size:.88rem}th{background:var(--soft);color:var(--ink)}
+.empty{padding:2rem;text-align:center;color:var(--mute)}
+@media(max-width:900px){.cols{grid-template-columns:1fr}.row{grid-template-columns:1.6rem minmax(0,1fr) 80px 75px}.row .nba{display:none}}
+</style>
+</head>
+<body>
+<header><h1>LeadLens SDR Workbench</h1><span class="mode" id="mode">Loading…</span></header>
+<div class="tabs" role="tablist"><button class="on" data-t="leads" role="tab">My leads</button><button data-t="model" role="tab">Model and results</button></div>
+<main>
+<div id="leads">
+<div class="kpis" id="kpis"></div>
+<div class="cols">
+<div class="box"><div class="bar-top" id="filters"></div><div class="list" id="list" role="list"></div></div>
+<div class="box" id="detail"><div class="empty">Select a lead to see its AI score, next best action and why.</div></div>
+</div></div>
+<div id="model" hidden></div>
+</main>
+<script>
+const EMBED=/*EMBED*/null/*END*/;
+const SEN=["Individual","Manager","Director","VP","C-Level"],INDS=["Technology","Finance","Healthcare","Manufacturing","Retail","Education","Other"],SRCS=["Web","Referral","Event","Paid Ad","Partner","Cold Outbound"];
+const RAW={email_opens:"Email_Opens_14d",email_clicks:"Email_Clicks_14d",web_visits:"Web_Visits_14d",pricing_visits:"Pricing_Page_Visits",form_fills:"Form_Fills",previous_touches:"Previous_Touches",campaign_responses:"Campaign_Responses",days_since_activity:"Days_Since_Last_Activity",days_since_created:"Days_Since_Created",has_phone:"Has_Phone",free_email:"Free_Email_Domain",requested_demo:"Requested_Demo"};
+const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let M,L=[],sel=null,draft=null,filt="All",q="",LOG=[],API=false,newN=0;
+
+/* ---- scoring engine: same logic as src/features.py, src/model_io.py and src/recommend.py ---- */
+function featurize(l){const o={seniority_level:Math.max(0,SEN.indexOf(l.Seniority)),log_employees:Math.log1p(Math.max(1,+l.NumberOfEmployees||1))};
+ for(const k in RAW)o[k]=+l[RAW[k]]||0;INDS.forEach(i=>o["industry_"+i]=l.Industry===i?1:0);SRCS.forEach(s=>o["source_"+s]=l.LeadSource===s?1:0);return M.features.map(f=>o[f]);}
+const sig=z=>1/(1+Math.exp(-z));
+const priority=s=>s>=90?"Very High":s>=75?"High":s>=50?"Medium":"Low";
+const action=s=>s>=90?"Call the lead":s>=80?"Schedule a demo":s>=70?"Send personalized email":s>=50?"Follow up later":"Put into nurture";
+function phrase(name,v,pos,l){const n=Math.trunc(v);
+ if(name==="seniority_level")return pos?`Senior decision maker (${l.Title})`:`Junior role (${l.Title})`;
+ if(name==="log_employees"){const e=Number(Math.trunc(l.NumberOfEmployees)).toLocaleString("en-US");return pos?`Good-fit company size (${e} employees)`:`Small company (${e} employees)`}
+ const t={email_opens:[`Opened ${n} emails`,"Few email opens"],email_clicks:[`Clicked ${n} email links`,"No email clicks"],web_visits:[`${n} website visits`,"Little website activity"],pricing_visits:[`Viewed pricing page ${n}x`,"Never viewed pricing"],form_fills:[`Filled ${n} form(s)`,"No form fills"],previous_touches:[`${n} prior touches`,"No prior touches"],campaign_responses:[`Responded to ${n} campaigns`,"No campaign response"],days_since_activity:[n===0?"Active today":`Active ${n} days ago`,`No activity for ${n} days`],days_since_created:[`Fresh lead (${n} days old)`,`Aging lead (${n} days old)`],has_phone:["Phone on file","No phone number"],free_email:["Business email","Free email domain"],requested_demo:["Requested a demo","No demo request"]};
+ if(t[name])return t[name][pos?0:1];
+ if(name.startsWith("industry_"))return pos?`${name.slice(9)} industry fits target`:`${name.slice(9)} industry is a weaker fit`;
+ if(name.startsWith("source_"))return pos?`Source: ${name.slice(7)}`:`Source: ${name.slice(7)} converts less`;return name}
+function score(l){const x=featurize(l),c=new Array(x.length).fill(0);let raw=M.init;
+ for(const t of M.trees){let i=0;while(t.l[i]!==-1){const j=x[t.f[i]]<=t.t[i]?t.l[i]:t.r[i];c[t.f[i]]+=M.lr*(t.v[j]-t.v[i]);i=j}raw+=M.lr*t.v[i]}
+ const prob=sig(raw),s=Math.round(prob*100);
+ const cand=M.features.map((f,i)=>[f,x[i],c[i]]).filter(a=>!(/^(industry_|source_)/.test(a[0])&&a[1]!==1));
+ const pos=cand.filter(a=>a[2]>.15).sort((a,b)=>b[2]-a[2]).slice(0,3),neg=cand.filter(a=>a[2]<-.15).sort((a,b)=>a[2]-b[2]).slice(0,2);
+ let parts=s>=50?(pos.map(a=>phrase(a[0],a[1],true,l))):(neg.map(a=>phrase(a[0],a[1],false,l)));
+ if(!parts.length)parts=[s>=50?"Balanced signals":"Few buying signals"];
+ let act=action(s),reason=parts.join(" + ");
+ if(act==="Call the lead"&&!(+l.Has_Phone)){act="Send personalized email";reason+=" (no phone on file)"}
+ const drivers=cand.map(a=>({label:phrase(a[0],a[1],a[2]>0,l),c:a[2]})).sort((a,b)=>Math.abs(b.c)-Math.abs(a.c)).slice(0,8);
+ return{score:s,prob,priority:priority(s),action:act,reason,drivers}}
+const pc=p=>({"Very High":"vh","High":"hi","Medium":"md","Low":"lw"}[p]),pcol=p=>({"Very High":"var(--red)","High":"var(--amber)","Medium":"#0b7cc4","Low":"var(--grey)"}[p]);
+
+/* ---- UI ---- */
+function kpis(){const open=L.length,vh=L.filter(l=>l._s.priority==="Very High").length,avg=open?Math.round(L.reduce((a,l)=>a+l._s.score,0)/open):0;
+ $("#kpis").innerHTML=[[open,"Open leads"],[vh,"Very High priority"],[avg,"Average AI score"],[LOG.length,"Outcomes logged"]].map(k=>`<div class="kpi"><b>${k[0]}</b><span>${k[1]}</span></div>`).join("")}
+function filters(){$("#filters").innerHTML=["All","Very High","High","Medium","Low"].map(f=>`<button class="chip ${f===filt?"on":""}" data-f="${f}">${f}</button>`).join("")+`<input type="search" id="q" placeholder="Search name or company" value="${esc(q)}" aria-label="Search leads" style="margin-left:auto;min-width:0;flex:1 1 140px">`+(API?"":`<button class="chip" id="newlead">+ New lead</button>`)}
+function list(){const rows=L.filter(l=>(filt==="All"||l._s.priority===filt)&&(l.Name+l.Company).toLowerCase().includes(q.toLowerCase())).sort((a,b)=>b._s.score-a._s.score);
+ $("#list").innerHTML=`<div class="row hd"><span>#</span><span>Lead</span><span>AI score</span><span>Priority</span><span class="nba">Next best action</span></div>`+(rows.length?rows.slice(0,150).map((l,i)=>`<div class="row ${l.Id===sel?"sel":""}" data-id="${esc(l.Id)}" role="listitem" tabindex="0"><span>${i+1}</span><span><span class="nm">${esc(l.Name)}</span><small>${esc(l.Title)}, ${esc(l.Company)}</small></span><span class="sc">${l._s.score}<i><s style="width:${l._s.score}%;background:${pcol(l._s.priority)}"></s></i></span><span><span class="p ${pc(l._s.priority)}">${l._s.priority}</span></span><span class="nba">${esc(l._s.action)}</span></div>`).join(""):`<div class="empty">No leads match.</div>`)}
+const INPUTS=[["Pricing_Page_Visits","Pricing page visits",0,8],["Email_Opens_14d","Emails opened (14d)",0,15],["Email_Clicks_14d","Email clicks (14d)",0,10],["Web_Visits_14d","Website visits (14d)",0,25],["Days_Since_Last_Activity","Days since last activity",0,90],["Previous_Touches","Previous touches",0,12]];
+function detail(){const l=L.find(x=>x.Id===sel);if(!l){$("#detail").innerHTML=`<div class="empty">Select a lead to see its AI score, next best action and why.</div>`;return}
+ draft={...l};const logs=LOG.filter(o=>o.id===l.Id);
+ $("#detail").innerHTML=`<div class="det"><h2>${esc(l.Name)}</h2><div class="sub">${esc(l.Title)} at ${esc(l.Company)} · ${esc(l.Industry)} · ${Number(l.NumberOfEmployees).toLocaleString("en-US")} employees · ${esc(l.LeadSource)}</div>
+ <div id="ai"></div>
+ <div class="sect"><h3>What-if: update the lead and re-score</h3><div class="wi">${INPUTS.map(i=>`<div><label>${i[1]}<span id="v_${i[0]}">${l[i[0]]}</span></label><input type="range" min="${i[2]}" max="${i[3]}" value="${l[i[0]]}" data-k="${i[0]}" aria-label="${i[1]}"></div>`).join("")}
+ <div><label>Seniority</label><select data-k="Seniority">${SEN.map(s=>`<option ${s===l.Seniority?"selected":""}>${s}</option>`).join("")}</select></div>
+ <div><label>Lead source</label><select data-k="LeadSource">${SRCS.map(s=>`<option ${s===l.LeadSource?"selected":""}>${s}</option>`).join("")}</select></div>
+ <div><label><span>Requested a demo</span><input type="checkbox" data-k="Requested_Demo" ${+l.Requested_Demo?"checked":""}></label></div>
+ <div><label><span>Phone on file</span><input type="checkbox" data-k="Has_Phone" ${+l.Has_Phone?"checked":""}></label></div></div>
+ <div class="act" style="margin-top:.6rem"><button class="btn" id="save">Save to Salesforce</button><button class="btn alt" id="reset">Reset</button></div></div>
+ <div class="sect"><h3>SDR action and result</h3><div class="act"><span id="doact"></span><select id="res" aria-label="Result"><option>Meeting booked</option><option>No response</option><option>Not interested</option><option>Converted</option></select><button class="btn" id="logb">Log outcome</button></div>
+ <ul class="log" id="loglist">${logs.map(o=>`<li>${esc(o.action)}: ${esc(o.result)}</li>`).join("")}</ul></div></div>`;ai()}
+function ai(){const l=sel&&L.find(x=>x.Id===sel),s=score(draft),changed=l&&s.score!==l._s.score;
+ $("#ai").innerHTML=`<div class="ai"><div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap"><span class="big">${s.score}<small style="font-size:1rem;font-weight:600">/100</small></span><span class="p ${pc(s.priority)}">${s.priority}</span>${changed?`<span style="font-size:.8rem;color:var(--mute)">was ${l._s.score}</span>`:""}</div>
+ <div class="fld"><span>AI Lead Score</span><b>${s.score}</b></div><div class="fld"><span>Conversion Probability</span><b>${(s.prob*100).toFixed(1)}%</b></div><div class="fld"><span>Priority</span><b>${s.priority}</b></div><div class="fld"><span>Next Best Action</span><b>${esc(s.action)}</b></div><div class="fld"><span>Recommendation Reason</span><b>${esc(s.reason)}</b></div></div>
+ <div class="sect" style="margin-top:0"><h3>Why this score (impact on conversion odds)</h3>${(m=>s.drivers.map(d=>`<div class="drv"><span>${esc(d.label)}</span><span><i style="width:${Math.abs(d.c)/m*100}%;background:${d.c>0?"var(--green)":"var(--red)"}"></i></span><b>${d.c>0?"+":""}${d.c.toFixed(2)}</b></div>`).join(""))(Math.max(...s.drivers.map(d=>Math.abs(d.c)),.01))}</div>`;
+ const da=$("#doact");if(da)da.textContent="Do: "+s.action+" → "}
+function model(){const m=M.metrics;if(!m){$("#model").innerHTML=`<div class="empty">No metrics embedded.</div>`;return}
+ const mx=Math.max(...m.importance.map(i=>i.mean_abs_impact));
+ $("#model").innerHTML=`<div class="cols"><div class="box det"><h2>Model comparison (held-out test set, ${m.test_size.toLocaleString()} leads)</h2><table><tr><th>Model</th><th>AUC</th><th>Precision top 20%</th><th>Lift</th></tr>${m.models.map(r=>`<tr><td>${esc(r.model)}</td><td>${r.auc}</td><td>${(r.precision_top20*100).toFixed(1)}%</td><td>${r.lift_top20}x</td></tr>`).join("")}</table>
+ <p class="sub">5-fold cross-validated AUC of the gradient boosting model: ${m.cv_auc_mean}. Overall conversion rate is ${(m.base_conversion_rate*100).toFixed(0)}%. Data is synthetic, so the logistic baseline does as well as the boosted model; on messy real CRM data trees usually pull ahead.</p>
+ <h3 style="margin-top:1rem">Does the priority tier mean something?</h3><table><tr><th>Priority</th><th>Leads</th><th>Actually converted</th></tr>${m.tiers.map(t=>`<tr><td><span class="p ${pc(t.priority)}">${t.priority}</span></td><td>${t.leads}</td><td><b>${t.conversion_rate==null?"-":(t.conversion_rate*100).toFixed(1)+"%"}</b></td></tr>`).join("")}</table></div>
+ <div class="box det"><h2>What the model relies on most</h2>${m.importance.map(i=>`<div class="drv"><span>${esc(i.feature.replace(/_/g," "))}</span><span><i style="width:${i.mean_abs_impact/mx*100}%;background:var(--blue)"></i></span><b>${i.mean_abs_impact}</b></div>`).join("")}<div class="note">Impact is the average change in log-odds each feature causes. The same attribution drives the "Why this score" bars on every lead.</div></div></div>`}
+
+document.addEventListener("click",e=>{const t=e.target;
+ if(t.dataset.t){document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b===t));$("#leads").hidden=t.dataset.t!=="leads";$("#model").hidden=t.dataset.t!=="model";return}
+ if(t.dataset.f){filt=t.dataset.f;filters();list();return}
+ const r=t.closest(".row[data-id]");if(r){sel=r.dataset.id;list();detail();return}
+ if(t.id==="newlead"){const id="NEW-"+(++newN);L.push(mk({Id:id,Name:"New Lead "+newN,Company:"Acme Corp",Title:"Manager",Seniority:"Manager",Industry:"Technology",NumberOfEmployees:100,LeadSource:"Web",Email_Opens_14d:0,Email_Clicks_14d:0,Web_Visits_14d:0,Pricing_Page_Visits:0,Form_Fills:0,Previous_Touches:0,Campaign_Responses:0,Days_Since_Last_Activity:30,Days_Since_Created:1,Has_Phone:1,Free_Email_Domain:0,Requested_Demo:0}));sel=id;kpis();list();detail();return}
+ if(t.id==="save"){const l=L.find(x=>x.Id===sel),ch={};for(const k in draft)if(draft[k]!==l[k]&&!k.startsWith("_"))ch[k]=draft[k];Object.assign(l,draft);l._s=score(l);
+  if(API&&Object.keys(ch).length)fetch("/api/leads/"+encodeURIComponent(l.Id),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(ch)}).catch(()=>{});kpis();list();detail();return}
+ if(t.id==="reset"){detail();return}
+ if(t.id==="logb"){const l=L.find(x=>x.Id===sel),res=$("#res").value,a=l._s.action;LOG.push({id:l.Id,action:a,result:res});
+  if(API)fetch("/api/outcome",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lead_id:l.Id,action:a,result:res,score:l._s.score})}).catch(()=>{});
+  if(res==="Converted"||res==="Not interested"){L=L.filter(x=>x.Id!==l.Id);sel=null}kpis();list();detail();}});
+document.addEventListener("input",e=>{const t=e.target;
+ if(t.id==="q"){q=t.value;list();return}
+ const k=t.dataset.k;if(k&&draft){draft[k]=t.type==="checkbox"?(t.checked?1:0):(t.tagName==="SELECT"?t.value:+t.value);const v=$("#v_"+k);if(v)v.textContent=draft[k];ai()}});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.classList.contains("row")&&e.target.dataset.id){sel=e.target.dataset.id;list();detail()}});
+const mk=l=>(l._s=score(l),l);
+async function init(){try{
+ if(EMBED){M=EMBED.model;L=EMBED.leads;$("#mode").textContent="Standalone demo: real trained model running in your browser"}
+ else{M=await (await fetch("/model.json")).json();L=await (await fetch("/api/leads?limit=400")).json();API=true;$("#mode").textContent="Live API · "+((await (await fetch("/health")).json()).crm==="salesforce"?"Salesforce":"Mock CRM")}
+ L.forEach(mk);kpis();filters();list();model();
+}catch(err){$("#mode").textContent="Could not load";$("#list").innerHTML=`<div class="empty">Failed to load: ${esc(err.message)}</div>`}}
+init();
+</script>
+</body>
+</html>

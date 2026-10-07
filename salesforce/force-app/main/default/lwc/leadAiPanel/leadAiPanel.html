@@ -1,0 +1,15 @@
+<template>
+  <lightning-card title="LeadLens AI" icon-name="utility:einstein">
+    <template if:true={lead.data}>
+      <div class="slds-p-horizontal_medium">
+        <p class="slds-text-heading_large">{score}/100 <lightning-badge label={priority}></lightning-badge></p>
+        <lightning-progress-bar value={score} size="large"></lightning-progress-bar>
+        <dl class="slds-m-top_small">
+          <dt class="slds-text-title">Conversion Probability</dt><dd>{probability}%</dd>
+          <dt class="slds-text-title slds-m-top_x-small">Next Best Action</dt><dd class="slds-text-heading_small">{action}</dd>
+          <dt class="slds-text-title slds-m-top_x-small">Why</dt><dd>{reason}</dd>
+        </dl>
+      </div>
+    </template>
+  </lightning-card>
+</template>

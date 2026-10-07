@@ -1,0 +1,87 @@
+{
+  "models": [
+    {
+      "model": "Logistic regression (baseline)",
+      "auc": 0.8762,
+      "precision_top20": 0.8417,
+      "lift_top20": 2.52,
+      "conversions_captured_top20": 0.5042,
+      "brier": 0.1292
+    },
+    {
+      "model": "Gradient boosting (production)",
+      "auc": 0.8708,
+      "precision_top20": 0.8222,
+      "lift_top20": 2.46,
+      "conversions_captured_top20": 0.4925,
+      "brier": 0.133
+    }
+  ],
+  "cv_auc_mean": 0.8581,
+  "test_size": 1800,
+  "base_conversion_rate": 0.334,
+  "tiers": [
+    {
+      "priority": "Very High",
+      "leads": 115,
+      "conversion_rate": 0.957
+    },
+    {
+      "priority": "High",
+      "leads": 124,
+      "conversion_rate": 0.879
+    },
+    {
+      "priority": "Medium",
+      "leads": 256,
+      "conversion_rate": 0.613
+    },
+    {
+      "priority": "Low",
+      "leads": 1305,
+      "conversion_rate": 0.172
+    }
+  ],
+  "importance": [
+    {
+      "feature": "seniority_level",
+      "mean_abs_impact": 0.456
+    },
+    {
+      "feature": "email_opens",
+      "mean_abs_impact": 0.383
+    },
+    {
+      "feature": "days_since_activity",
+      "mean_abs_impact": 0.353
+    },
+    {
+      "feature": "requested_demo",
+      "mean_abs_impact": 0.343
+    },
+    {
+      "feature": "log_employees",
+      "mean_abs_impact": 0.302
+    },
+    {
+      "feature": "pricing_visits",
+      "mean_abs_impact": 0.276
+    },
+    {
+      "feature": "web_visits",
+      "mean_abs_impact": 0.242
+    },
+    {
+      "feature": "email_clicks",
+      "mean_abs_impact": 0.213
+    },
+    {
+      "feature": "source_Cold Outbound",
+      "mean_abs_impact": 0.153
+    },
+    {
+      "feature": "form_fills",
+      "mean_abs_impact": 0.127
+    }
+  ]
+}
