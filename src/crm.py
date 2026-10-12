@@ -34,7 +34,8 @@ def fetch_open_leads(limit=500) -> pd.DataFrame:
         recs = _sf().query_all(soql)["records"]
         df = pd.DataFrame(recs).drop(columns="attributes", errors="ignore").rename(columns=SF_MAP)
         return df.fillna({"NumberOfEmployees": 1})
-    return pd.read_csv(MOCK).head(limit)
+    # AI_* columns are outputs, not inputs: drop them so re-scoring never duplicates columns
+    return pd.read_csv(MOCK).head(limit).drop(columns=AI_FIELDS + ["AI_Scored_At__c"], errors="ignore")
 
 
 def write_scores(scored: pd.DataFrame):

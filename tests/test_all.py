@@ -75,6 +75,45 @@ def test_api_and_crm_loop():
     assert "AI_Score__c" in pd.read_csv(crm.MOCK).columns
 
 
+def _run_upload(csv_text, sdrs="SDR 1,SDR 2,SDR 3"):
+    with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False) as fh:
+        fh.write(csv_text); path = fh.name
+    out = subprocess.run(["node", str(ROOT / "tests/upload.js"), str(ROOT / "web/workbench.html"), str(ROOT / "models/model.json"), path, sdrs],
+                         capture_output=True, text=True, check=True).stdout
+    os.unlink(path)
+    return json.loads(out)
+
+
+def test_csv_upload_scores_like_python_and_assigns_sdrs():
+    df = pd.read_csv(ROOT / "data/crm_leads.csv").head(300)
+    cols = ["Id", "Name", "Company", "Title", "Industry", "NumberOfEmployees", "LeadSource", "Email_Opens_14d", "Email_Clicks_14d", "Web_Visits_14d",
+            "Pricing_Page_Visits", "Form_Fills", "Previous_Touches", "Campaign_Responses", "Days_Since_Last_Activity", "Days_Since_Created",
+            "Has_Phone", "Free_Email_Domain", "Requested_Demo"]   # no Seniority column: it must be inferred from Title
+    res = _run_upload(df[cols].to_csv(index=False))
+    assert res["missing"] == [] and len(res["leads"]) == 300
+    for r, j in zip(df.to_dict("records"), res["leads"]):
+        p = recommend.score_lead(MODEL, r)
+        assert (p["AI_Score__c"], p["Next_Best_Action__c"]) == (j["score"], j["action"]), (p["AI_Score__c"], j)
+    sdr = pd.Series([j["sdr"] for j in res["leads"]])
+    assert set(sdr) <= {"SDR 1", "SDR 2", "SDR 3", "Marketing nurture"}
+    assert all(j["sdr"] == "Marketing nurture" for j in res["leads"] if j["action"] == "Put into nurture")
+    counts = sdr[sdr != "Marketing nurture"].value_counts()
+    assert counts.max() - counts.min() <= 2, counts
+    print("upload parity OK; SDR workload:", counts.to_dict(), "| nurture:", int((sdr == "Marketing nurture").sum()))
+
+
+def test_csv_upload_handles_messy_headers_and_values():
+    csv = ('\ufeffFull Name;Account;Job Title;Employees;Phone;Email;Demo Requested;Pricing Views;Lead Source;Sector\n'
+           '"Asha Rao";"Nova, Inc";"VP of Sales";"1,200";"+91 99999 99999";asha@nova.com;Yes;4;Partner Referral;Software\n'
+           'Tom Lee;Blue Works;Analyst;8;;tom@gmail.com;No;0;Cold Call;School\n')
+    res = _run_upload(csv, "Ravi,Meera")
+    a, b = res["leads"]
+    assert a["Seniority"] == "VP" and b["Seniority"] == "Individual"
+    assert a["score"] > b["score"] and a["sdr"] in ("Ravi", "Meera")
+    assert "Email Opens 14d" in res["missing"]
+    print("messy CSV OK:", a["score"], a["action"], "|", b["score"], b["action"])
+
+
 if __name__ == "__main__":
     import shutil
     backup = crm.MOCK.with_suffix(".bak"); shutil.copy(crm.MOCK, backup)

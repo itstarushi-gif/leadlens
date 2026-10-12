@@ -35,6 +35,14 @@ python -m tests.test_all           # all tests
 python -m scripts.build_standalone # one-file demo -> dist/leadlens_workbench.html
 ```
 
+## Upload your own leads (CSV)
+In the SDR Workbench click **Upload leads (CSV)**, choose a file with one lead per row, type your SDR names, and click
+**Score and assign**. Every lead gets an AI score, priority, next best action, a reason and an assigned SDR. The best leads are
+shared evenly across the SDRs (leads whose action is "Put into nurture" go to Marketing nurture). A workload table shows leads per
+SDR, and **Download results (CSV)** exports everything. Use **Download template** for the expected columns. Headers can be
+Salesforce names or simple names (Job Title, Employees, Email Opens, Demo Requested...). Missing columns use safe defaults and the
+page tells you which ones. Scoring runs in your browser, so the file never leaves your computer.
+
 ## Results (held-out test set, 1,800 leads)
 | Model | AUC | Precision top 20% | Lift |
 |---|---|---|---|
